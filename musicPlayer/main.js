@@ -11,17 +11,15 @@
 
     let cvs = document.getElementById("canvas"),
         ctx = cvs.getContext("2d"),
+        W = cvs.width = 800,
+        H = cvs.height = 512,
         Spectrums = [],
         SpectrumNum = 128;
-
-    cvs.width = 800;
-    cvs.height = 512;
 
     let grd = ctx.createLinearGradient(0, 50, 0, 220);
     grd.addColorStop(0, "#f00");
     grd.addColorStop(0.5, "#ff0");
     grd.addColorStop(1, "#0f0");
-
 
     cvs.onmousewheel = (e) => {
         if (e.deltaY > 0) {
@@ -32,8 +30,9 @@
         }
     };
 
+
     class Spectrum {
-        constructor (x, y, w, h) {
+        constructor(x, y, w, h) {
             this.x = x;
             this.y = y;
             this.w = w;
@@ -43,14 +42,14 @@
             this.grd = grd;
         }
 
-        draw (ctx) {
+        draw(ctx) {
             this.dh = this.h > this.dh ? this.h : this.dh;
             ctx.fillStyle = this.grd;
             ctx.fillRect(this.x, this.y - this.h, this.w, this.h);
             ctx.fillRect(this.x, this.y - this.dh - this.dl * 2, this.w, this.dl);
         }
 
-        update (h) {
+        update(h) {
             this.h = h;
             this.dh -= 0.5
         }
@@ -62,16 +61,17 @@
             arr = new Uint8Array(len);
         analyser.getByteFrequencyData(arr);
 
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        ctx.clearRect(0, 0, W, H);
 
-        for (let i=0; i<Spectrums.length; i++) {
+        for (let i = 0; i < Spectrums.length; i++) {
             let st = Spectrums[i];
             st.draw(ctx);
-            st.update(arr[~~(i*arr.length/Spectrums.length)]);
+            st.update(arr[~~(i * arr.length / Spectrums.length)]);
         }
 
         RAF(animate)
     };
+
 
     (() => {
         audio.src = src;
@@ -82,11 +82,12 @@
         bufferSrc.connect(analyser);
         analyser.connect(gainNode);
 
-        let aw = cvs.width / SpectrumNum,
+        let aw = W / SpectrumNum,
             w = aw - 3;
-        for (let i=0; i<SpectrumNum; i++) {
-            Spectrums.push(new Spectrum(i * aw, cvs.height / 2, w, 0))
+        for (let i = 0; i < SpectrumNum; i++) {
+            Spectrums.push(new Spectrum(i * aw, H / 2, w, 0))
         }
+
         animate()
     })();
 
