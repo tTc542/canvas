@@ -1,0 +1,67 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>wallpaper</title>
+  <style>
+    html, body {
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+  let cvs = document.getElementById('canvas'),
+    ctx = cvs.getContext('2d'),
+    w = cvs.width = window.innerWidth,
+    h = cvs.height = window.innerHeight,
+    step = 80,
+    dots = [],
+    r = 0,
+    DEG = Math.PI * 2,
+    cos = Math.cos,
+    rd = Math.random,
+    rdY = (d) => {
+      let t = d + (rd() * 2 - 1) * step;
+      return (t > h || t < 0) ? rdY(d) : t
+    },
+    draw = (i, j) => {
+      let _d = {
+        x: j.x + (rd() * 2 - 0.25) * step,
+        y: rdY(j.y)
+      };
+      ctx.beginPath();
+      ctx.moveTo(i.x, i.y);
+      ctx.lineTo(j.x, j.y);
+      ctx.lineTo(_d.x, _d.y);
+      ctx.closePath();
+      r -= DEG / -50;
+      ctx.fillStyle = '#' + (cos(r) * 127 + 128 << 16 | cos(r + DEG / 3) * 127 + 128 << 8 | cos(r + DEG / 3 * 2) * 127 + 128).toString(16);
+      ctx.fill();
+      dots = [j, _d];
+    },
+    init = () => {
+      ctx.clearRect(0, 0, w, h);
+      dots = [
+        {x: 0, y: h * .5 + step},
+        {x: 0, y: h * .5 - step}
+      ];
+      while (dots[1].x < w + step) draw(dots[0], dots[1])
+    };
+
+  cvs.onclick = init;
+
+  init()
+</script>
+</body>
+</html>
